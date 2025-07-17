@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Maths Question Generator</title>
+    <style>
+      body { font-family: Arial; text-align: center; margin-top: 40px; }
+      button { font-size: 20px; padding: 10px 20px; }
+      ul { list-style-type: none; padding: 0; }
+      li { margin: 10px 0; font-size: 18px; }
+    </style>
+  </head>
+  <body>
+    <h1>Maths Question Generator</h1>
+    <button onclick="generateQuestions()">🎲 Δώσε μου ερωτήσεις!</button>
+    <ul id="questions"></ul>
+
+    <script>
+      const questionBank = [
+        "5 × 7 = ?",
+        "12 + 15 = ?",
+        "40 ÷ 8 = ?",
+        "60 − 27 = ?",
+        "9 × 6 = ?",
+        "3² = ?",
+        "100 − 35 = ?",
+        "25 + 36 = ?",
+        "81 ÷ 9 = ?",
+        "14 + 9 = ?"
+      ];
+
+      function generateQuestions() {
+        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+        const selected = shuffled.slice(0, 5);
+        const ul = document.getElementById("questions");
+        ul.innerHTML = "";
+        selected.forEach(q => {
+          const li = document.createElement("li");
+          li.textContent = q;
+          ul.appendChild(li);
+        });
+      }
+    </script>
+  </body>
+</html>
