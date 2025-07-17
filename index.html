@@ -1,45 +1,103 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Maths Question Generator</title>
-    <style>
-      body { font-family: Arial; text-align: center; margin-top: 40px; }
-      button { font-size: 20px; padding: 10px 20px; }
-      ul { list-style-type: none; padding: 0; }
-      li { margin: 10px 0; font-size: 18px; }
-    </style>
-  </head>
-  <body>
-    <h1>Maths Question Generator</h1>
-    <button onclick="generateQuestions()">🎲 Δώσε μου ερωτήσεις!</button>
-    <ul id="questions"></ul>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Maths Question Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
+    button { font-size: 18px; padding: 10px 20px; cursor: pointer; }
+    ul { list-style-type: none; padding: 0; margin-top: 20px; }
+    li { margin: 8px 0; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Maths Question Generator</h1>
+  <button onclick="generateQuestions()">🎲 Δώσε μου 10 ερωτήσεις!</button>
+  <ul id="questions"></ul>
 
-    <script>
-      const questionBank = [
-        "5 × 7 = ?",
-        "12 + 15 = ?",
-        "40 ÷ 8 = ?",
-        "60 − 27 = ?",
-        "9 × 6 = ?",
-        "3² = ?",
-        "100 − 35 = ?",
-        "25 + 36 = ?",
-        "81 ÷ 9 = ?",
-        "14 + 9 = ?"
-      ];
+  <script>
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 
-      function generateQuestions() {
-        const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
-        const selected = shuffled.slice(0, 5);
-        const ul = document.getElementById("questions");
-        ul.innerHTML = "";
-        selected.forEach(q => {
-          const li = document.createElement("li");
-          li.textContent = q;
-          ul.appendChild(li);
-        });
+    function pickQuestion(topic) {
+      let a,b,c,d,r1,r2,x,bn;
+      switch(topic) {
+        case 'lin_eq':
+          a = randomInt(1,9);
+          x = randomInt(-10,10);
+          b = -a*x;
+          return `Solve: ${a}x + ${b} = 0 → x = ______`;
+        case 'lin_eq_frac':
+          d = [2,3,4,5][randomInt(0,3)];
+          x = randomInt(-10,10);
+          bn = Math.trunc(-x/d);
+          return `Solve: x/${d} + ${bn} = 0 → x = ______`;
+        case 'quad_eq':
+          a = randomInt(1,5);
+          r1 = randomInt(-5,5); r2 = randomInt(-5,5);
+          b = -a * (r1 + r2);
+          c = a * r1 * r2;
+          return `Solve: ${a}x² + ${b}x + ${c} = 0 → x = ______`;
+        case 'quad_eq_miss':
+          a = randomInt(1,5);
+          r1 = randomInt(1,5);
+          c = -a * r1 * r1;
+          return `Solve: ${a}x² ${c<0?'-':'+'} ${Math.abs(c)} = 0 → x = ______`;
+        case 'ineq_lin':
+          a = randomInt(1,9);
+          x = randomInt(-10,10);
+          b = -a*x;
+          let op = ['<','>','≤','≥'][randomInt(0,3)];
+          return `Solve: ${a}x + ${b} ${op} 0 → x ______`;
+        case 'ineq_quad':
+          a = randomInt(1,5);
+          r1 = randomInt(-5,0); r2 = randomInt(1,5);
+          b = -a * (r1 + r2);
+          c = a * r1 * r2;
+          return `Solve: ${a}x² + ${b}x + ${c} > 0 → ______`;
+        case 'func_eq':
+          a = randomInt(1,5); c = randomInt(1,5);
+          x = randomInt(-5,5);
+          b = randomInt(-5,5);
+          d = a*x + b - c*x;
+          return `f(x)=${a}x+${b}, g(x)=${c}x+${d}. f(x)=g(x) → x = ______`;
+        case 'func_ops':
+          a = randomInt(1,5); b = randomInt(-5,5);
+          c = randomInt(1,5); d = randomInt(-5,5);
+          return `If f(x)=${a}x+${b}, g(x)=${c}x+${d}, find (f+g)(x): ______`;
+        case 'func_comp':
+          a = randomInt(1,5); b = randomInt(-5,5);
+          c = randomInt(1,5); d = randomInt(-5,5);
+          return `Given f(x)=${a}x+${b}, g(x)=${c}x+${d}, find f∘g and g∘f: ______`;
+        case 'factor':
+          if (Math.random() < 0.5) {
+            let f = randomInt(2,9), u = randomInt(1,9), v = randomInt(1,9);
+            return `Factorise: ${f*u}x + ${f*v} = ______`;
+          } else {
+            r1 = randomInt(2,9);
+            return `Factorise: x² - ${r1*r1} = ______`;
+          }
       }
-    </script>
-  </body>
+    }
+
+    const topics = [
+      'lin_eq','lin_eq_frac','quad_eq','quad_eq_miss',
+      'ineq_lin','ineq_quad','func_eq','func_ops',
+      'func_comp','factor'
+    ];
+
+    function generateQuestions() {
+      const ul = document.getElementById('questions');
+      ul.innerHTML = '';
+      for (let i = 1; i <= 10; i++) {
+        let t = topics[randomInt(0, topics.length - 1)];
+        let q = pickQuestion(t);
+        let li = document.createElement('li');
+        li.textContent = `${i}. ${q}`;
+        ul.appendChild(li);
+      }
+    }
+  </script>
+</body>
 </html>
