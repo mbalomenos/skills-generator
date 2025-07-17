@@ -5,8 +5,8 @@
   <title>Generator Μαθηματικών Ερωτήσεων</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
-    button { font-size: 18px; padding: 10px 20px; cursor: pointer; }
-    ul { list-style-type: none; padding: 0; margin-top: 20px; text-align: left; display: inline-block; }
+    button { font-size: 18px; padding: 10px 20px; cursor: pointer; margin-bottom: 20px; }
+    ul { list-style-type: none; padding: 0; margin: 0 auto; max-width: 600px; text-align: left; }
     li { margin: 10px 0; font-size: 18px; }
   </style>
 </head>
@@ -16,27 +16,47 @@
   <ul id="questions"></ul>
 
   <script>
-    // Βοηθητική συνάρτηση για τυχαίο ακέραιο
+    // Βοηθητικές συναρτήσεις
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+    function makeFunc(type) {
+      let a, b, c;
+      switch(type) {
+        case 'rational':
+          a = randomInt(1,5);
+          b = randomInt(-5,5);
+          c = randomInt(1,5);
+          return `(${a}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)})/(x ${c >= 0 ? '-' : '+'} ${Math.abs(c)})`;
+        case 'radical':
+          a = randomInt(1,5);
+          b = randomInt(-5,5);
+          return `√(${a}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)})`;
+        case 'logarithmic':
+          a = randomInt(1,5);
+          b = randomInt(-5,5);
+          return `ln(${a}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)})`;
+        case 'mixed':
+          a = randomInt(1,5);
+          b = randomInt(-5,5);
+          c = randomInt(1,5);
+          return `√(${a}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)})/(x ${c >= 0 ? '-' : '+'} ${Math.abs(c)})`;
+      }
+    }
 
-    // Συνάρτηση που επιστρέφει μία ερώτηση για το δοσμένο topic
     function pickQuestion(topic) {
-      let a, b, c, d, r1, r2, x, expr;
+      let a, b, c, d, r1, r2, x;
       switch(topic) {
         case 'lin_eq':
           a = randomInt(1,9);
           x = randomInt(-10,10);
           b = -a * x;
           return `Λύσε την εξίσωση: ${a}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)} = 0.`;
-
         case 'lin_eq_frac':
           d = [2,3,4,5][randomInt(0,3)];
           x = randomInt(-10,10);
           b = Math.trunc(-x / d);
           return `Λύσε την εξίσωση: x/${d} ${b >= 0 ? '+' : '-'} ${Math.abs(b)} = 0.`;
-
         case 'quad_eq':
           a = randomInt(1,5);
           r1 = randomInt(-5,5);
@@ -44,20 +64,17 @@
           b = -a * (r1 + r2);
           c = a * r1 * r2;
           return `Λύσε την εξίσωση: ${a}x² ${b >= 0 ? '+' : '-'} ${Math.abs(b)}x ${c >= 0 ? '+' : '-'} ${Math.abs(c)} = 0.`;
-
         case 'quad_eq_miss':
           a = randomInt(1,5);
           r1 = randomInt(1,5);
           c = -a * r1 * r1;
           return `Λύσε την εξίσωση: ${a}x² ${c >= 0 ? '+' : '-'} ${Math.abs(c)} = 0.`;
-
         case 'ineq_lin':
           a = randomInt(1,9);
           x = randomInt(-10,10);
           b = -a * x;
           d = ['<','>','≤','≥'][randomInt(0,3)];
           return `Λύσε την ανίσωση: ${a}x ${b >= 0 ? '+' : '-'} ${Math.abs(b)} ${d} 0.`;
-
         case 'ineq_quad':
           a = randomInt(1,5);
           r1 = randomInt(-5,0);
@@ -65,50 +82,23 @@
           b = -a * (r1 + r2);
           c = a * r1 * r2;
           return `Λύσε την ανίσωση: ${a}x² ${b >= 0 ? '+' : '-'} ${Math.abs(b)}x ${c >= 0 ? '+' : '-'} ${Math.abs(c)} > 0.`;
-
         case 'func_eq':
-          // random function types for f and g
-          const funcs = ['rational', 'radical', 'logarithmic', 'mixed'];
-          const fType = funcs[randomInt(0, funcs.length-1)];
-          const gType = funcs[randomInt(0, funcs.length-1)];
-          function makeFunc(type) {
-            switch(type) {
-              case 'rational':
-                a = randomInt(1,5); b = randomInt(-5,5); c = randomInt(1,5);
-                return `(${a}x ${b>=0?'+':'-'} ${Math.abs(b)})/(x ${c>=0?'-':'+'} ${Math.abs(c)})`;
-              case 'radical':
-                a = randomInt(1,5); b = randomInt(-5,5);
-                return `√(${a}x ${b>=0?'+':'-'} ${Math.abs(b)})`;
-              case 'logarithmic':
-                a = randomInt(1,5);
-                return `ln(${a}x ${randomInt(-5,5)>=0?'+':'-'} ${Math.abs(randomInt(-5,5))})`;
-              case 'mixed':
-                a = randomInt(1,5); b = randomInt(-5,5); c = randomInt(1,5);
-                return `√(${a}x ${b>=0?'+':'-'} ${Math.abs(b)})/(x ${c>=0?'-':'+'} ${Math.abs(c)})`;
-            }
-          }
-          const fExpr = makeFunc(fType);
-          const gExpr = makeFunc(gType);
-          return `Δίνεται f(x)=${fExpr} και g(x)=${gExpr}. Λύστε f(x)=g(x).`; 
-
+          const types1 = ['rational','radical','logarithmic','mixed'];
+          const fExpr = makeFunc(types1[randomInt(0, types1.length-1)]);
+          const gExpr = makeFunc(types1[randomInt(0, types1.length-1)]);
+          return `Δίνεται f(x)=${fExpr} και g(x)=${gExpr}. Λύστε f(x)=g(x).`;
         case 'func_ops':
-          const ops = ['+', '-', '·', '/'];
+          const ops = ['+','-','·','/'];
           const op = ops[randomInt(0, ops.length-1)];
-          // pick two random functions
-          const f2 = funcs[randomInt(0, funcs.length-1)];
-          const g2 = funcs[randomInt(0, funcs.length-1)];
-          const exprF = makeFunc(f2);
-          const exprG = makeFunc(g2);
-          return `Δίνεται f(x)=${exprF} και g(x)=${exprG}. Βρείτε (f${op}g)(x).`;
-
+          const types2 = ['rational','radical','logarithmic','mixed'];
+          const f2 = makeFunc(types2[randomInt(0, types2.length-1)]);
+          const g2 = makeFunc(types2[randomInt(0, types2.length-1)]);
+          return `Δίνεται f(x)=${f2} και g(x)=${g2}. Βρείτε (f${op}g)(x).`;
         case 'func_comp':
-          // compositions with random f,g
-          const f3 = funcs[randomInt(0, funcs.length-1)];
-          const g3 = funcs[randomInt(0, funcs.length-1)];
-          const exprF3 = makeFunc(f3);
-          const exprG3 = makeFunc(g3);
-          return `Δίνεται f(x)=${exprF3} και g(x)=${exprG3}. Βρείτε f∘g και g∘f.`;
-
+          const types3 = ['rational','radical','logarithmic','mixed'];
+          const f3 = makeFunc(types3[randomInt(0, types3.length-1)]);
+          const g3 = makeFunc(types3[randomInt(0, types3.length-1)]);
+          return `Δίνεται f(x)=${f3} και g(x)=${g3}. Βρείτε f∘g και g∘f.`;
         case 'factor':
           if (Math.random() < 0.5) {
             let f = randomInt(2,9);
